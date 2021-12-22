@@ -6,6 +6,18 @@
 
 .wrapper {
     padding: 5rem 0 10rem;
+    .container {
+        @extend %container;
+    }
+    @media(max-width: $break-s) {
+        padding: 2rem 0 10rem;
+    }
+    
+}
+
+//PrevNext
+.pnWrapper {
+    display: flex;
     justify-content: center;
     gap: 2rem;
     margin-top: 5rem;

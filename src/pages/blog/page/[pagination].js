@@ -1,12 +1,12 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import Layout from '../components/layout'
-import * as style from '../styles/blog.module.scss'
-import SEO from '../components/seo'
-import { getAllBlogs, blogsPerPage } from '../utils/mdQueries'
-import Pagination from '../components/pagination'
+import Layout from '../../../components/layout'
+import * as style from '../../../styles/blog.module.scss'
+import SEO from '../../../components/seo'
+import Pagination from '../../../components/pagination'
+import { getAllBlogs, blogsPerPage } from '../../../utils/mdQueries'
 
-const Blog = ({ blogs, numberPages }) => {
+const PaginationPage = ({ blogs, numberPages }) => {
     return (
         <Layout>
             <SEO title='ブログ' description='これはブログページです' />
@@ -31,17 +31,31 @@ const Blog = ({ blogs, numberPages }) => {
                         )}
                     )}
                 </div>
-                <Pagination numberPages={numberPages}/>
+                <Pagination numberPages={numberPages} />
             </div>
         </Layout>
     )
 }
 
-export default Blog
+export default PaginationPage
 
-export async function getStaticProps() {
+export async function getStaticPaths() {
+    const { numberPages } = await getAllBlogs()
+
+    let paths = []
+    Array.from({ length: numberPages }).slice(0, 1).forEach((_, i) => paths.push(`/blog/page/${i + 2}`))
+
+    return {
+        paths: paths,
+        fallback: false,
+    }
+}
+
+export async function getStaticProps(context) {
     const { orderedBlogs, numberPages } = await getAllBlogs()
-    const limitedBlogs = orderedBlogs.slice(0, blogsPerPage)
+
+    const currentPage = context.params.pagination
+    const limitedBlogs = orderedBlogs.slice((currentPage - 1) * blogsPerPage, currentPage * blogsPerPage)
 
     return {
         props: {
